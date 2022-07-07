@@ -71,17 +71,17 @@ defaultGuessCount = 6
 
 class RandomWordGenerator:
     @classmethod
-    def generate(cls):
+    def generate(cls) -> str:
         return "abca"
 
 class GuessCount:
     @classmethod
-    def generate(cls,word):
+    def generate(cls,word) -> int:
         return defaultGuessCount
 
 class User:
     @classmethod
-    def enterInput(cls):
+    def enterInput(cls) -> str:
         return input("Guess a character ")
 
 class GuessCheck:
@@ -89,7 +89,7 @@ class GuessCheck:
     incorrectGuesses = [] #list of chars
 
     @classmethod
-    def alreadyGuessedChar(cls,guess):
+    def alreadyGuessedChar(cls,guess) -> bool:
         if ( guess in cls.correctGuesses ):
             return True
         if ( guess in cls.incorrectGuesses ):
@@ -97,14 +97,14 @@ class GuessCheck:
         return False
     
     @classmethod
-    def isCorrect(cls,guess,word):
+    def isCorrect(cls,guess,word) -> bool:
         if guess in word:
             return True
         return False
 
 class PrintString:
     @classmethod
-    def initialPrint(cls,word):
+    def initialPrint(cls,word) -> list[str]:
         lst = []
         for i in range(len(word)):
             print("_",end=" ")
@@ -113,11 +113,11 @@ class PrintString:
         return lst
 
     @classmethod
-    def alreadyGuessedChar(cls):
+    def alreadyGuessedChar(cls) -> None:
         print("Already guessed this char")
     
     @classmethod
-    def correctGuess(cls,correctGuesses,word):
+    def correctGuess(cls,correctGuesses,word) -> list[str]:
         lst = []
         for i in range(len(word)):
             if (word[i] in correctGuesses):
@@ -130,7 +130,7 @@ class PrintString:
         return lst
     
     @classmethod
-    def incorrectGuess(cls):
+    def incorrectGuess(cls) -> None:
         print("Incorrect")
 
 class Game:
@@ -142,7 +142,7 @@ class Game:
         pass
     
     @classmethod
-    def play(cls):
+    def play(cls) -> None:
         
         #initial print of dashed string
         cls.partialGuessedString  = PrintString.initialPrint(cls.word)
