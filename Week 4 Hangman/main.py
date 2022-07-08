@@ -85,13 +85,14 @@ class User:
         return s
     
 class GuessCheck:
-    correctGuesses = [] #list of chars
-    incorrectGuesses = [] #list of chars
+    def __init__(self) -> None:
+        self.correctGuesses = [] #list of chars
+        self.incorrectGuesses = [] #list of chars
 
     def alreadyGuessedChar(self,guess) -> bool:
-        if ( guess in cls.correctGuesses ):
+        if ( guess in self.correctGuesses ):
             return True
-        if ( guess in cls.incorrectGuesses ):
+        if ( guess in self.incorrectGuesses ):
             return True
         return False
     
@@ -99,6 +100,10 @@ class GuessCheck:
         if guess in word:
             return True
         return False
+    
+    def wordGuessed(self,partialGuessedString,word) -> bool:
+        return ( "".join(self._partialGuessedString) == self._word ):
+
 
 class PrintString:
     def initialPrint(self,word) -> list[str]:
@@ -160,8 +165,10 @@ class Game:
                 self._printString.incorrectGuess()
                 print(f"You have {self._guessCount} guesses left")
 
-            if ( "".join(self._partialGuessedString) == self._word ):
-                self._wordGuessed = True
+            
+                self._wordGuessed = self._guessCheck.wordGuessed(self._partialGuessedString,self._word)
+
+                if self._wordGuessed
                 print("You guessed the word")
                 break
         
