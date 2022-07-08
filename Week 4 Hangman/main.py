@@ -82,8 +82,11 @@ class GuessCount:
 class User:
     @classmethod
     def enterInput(cls) -> str:
-        return input("Guess a character ")
-
+        s = input("Guess an alphabet ")
+        while(len(s)==0 or len(s) > 1 or not(s[0]>='a' and s[0]<='z') or not (s[0]>='a' and s[0]<='z') ):
+            s = input("Enter a single alphabet ")
+        return s
+        
 class GuessCheck:
     correctGuesses = [] #list of chars
     incorrectGuesses = [] #list of chars
@@ -167,6 +170,11 @@ class Game:
         
         if not cls.wordGuessed:
             print("Out of Guesses")
+            print("The word was ",cls.word)
+        
+        newGame = input("Type y for new game , else n for end ->  ")
+        if newGame == 'y':
+            cls.play()
        
 
 if __name__ == "__main__":
