@@ -78,27 +78,24 @@ class GuessCount:
         return defaultGuessCount
 
 class User:
-    @classmethod
-    def enterInput(cls) -> str:
+    def enterInput(self) -> str:
         s = input("Guess an alphabet ")
         while(len(s)==0 or len(s) > 1 or not(s[0]>='a' and s[0]<='z') or not (s[0]>='a' and s[0]<='z') ):
             s = input("Enter a single alphabet ")
         return s
-        
+    
 class GuessCheck:
     correctGuesses = [] #list of chars
     incorrectGuesses = [] #list of chars
 
-    @classmethod
-    def alreadyGuessedChar(cls,guess) -> bool:
+    def alreadyGuessedChar(self,guess) -> bool:
         if ( guess in cls.correctGuesses ):
             return True
         if ( guess in cls.incorrectGuesses ):
             return True
         return False
     
-    @classmethod
-    def isCorrect(cls,guess,word) -> bool:
+    def isCorrect(self,guess,word) -> bool:
         if guess in word:
             return True
         return False
@@ -147,10 +144,13 @@ class Game:
         self._partialGuessedString  = self._printString.initialPrint(self._word)
 
         while(self._guessCount > 0):
+
             guess = self._user.enterInput()
+            
             if ( self._guessCheck.alreadyGuessedChar(guess) ):
                 self._printString.alreadyGuessedChar()
                 continue
+            
             self._guessCount -= 1
             if ( self._guessCheck.isCorrect(guess,self._word) ):
                 self._guessCheck.correctGuesses.append(guess)
