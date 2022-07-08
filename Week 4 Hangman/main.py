@@ -70,13 +70,11 @@
 defaultGuessCount = 6
 
 class RandomWordGenerator:
-    @classmethod
-    def generate(cls) -> str:
+    def generate(self) -> str:
         return "abca"
 
 class GuessCount:
-    @classmethod
-    def generate(cls,word) -> int:
+    def generate(self) -> int:
         return defaultGuessCount
 
 class User:
@@ -106,8 +104,7 @@ class GuessCheck:
         return False
 
 class PrintString:
-    @classmethod
-    def initialPrint(cls,word) -> list[str]:
+    def initialPrint(self,word) -> list[str]:
         lst = []
         for i in range(len(word)):
             print("_",end=" ")
@@ -115,12 +112,10 @@ class PrintString:
         print("")
         return lst
 
-    @classmethod
-    def alreadyGuessedChar(cls) -> None:
+    def alreadyGuessedChar(self) -> None:
         print("Already guessed this char")
     
-    @classmethod
-    def correctGuess(cls,correctGuesses,word) -> list[str]:
+    def correctGuess(self,correctGuesses,word) -> list[str]:
         lst = []
         for i in range(len(word)):
             if (word[i] in correctGuesses):
@@ -132,52 +127,54 @@ class PrintString:
         print("")
         return lst
     
-    @classmethod
-    def incorrectGuess(cls) -> None:
+    def incorrectGuess(self) -> None:
         print("Incorrect")
 
 class Game:
-    word = RandomWordGenerator.generate()
-    guessCount = GuessCount.generate(word)
-    wordGuessed = False
-    partialGuessedString = []
-    def __init__(self) -> None:
-        pass
     
-    @classmethod
-    def play(cls) -> None:
+    def __init__(self) -> None:
+        self._printString = PrintString()
+        self._guessCheck = GuessCheck()
+        self._guessCount = GuessCount().generate()
+        self._word = RandomWordGenerator().generate()
+        self._wordGuessed = False
+        self._user = User()
+        self._partialGuessedString = []
+
+    def play(self) -> None:
         
         #initial print of dashed string
-        cls.partialGuessedString  = PrintString.initialPrint(cls.word)
+        self._partialGuessedString  = self._printString.initialPrint(self._word)
 
-        while(cls.guessCount > 0):
-            guess = User.enterInput()
-            if ( GuessCheck.alreadyGuessedChar(guess) ):
-                PrintString.alreadyGuessedChar()
+        while(self._guessCount > 0):
+            guess = self._user.enterInput()
+            if ( self._guessCheck.alreadyGuessedChar(guess) ):
+                self._printString.alreadyGuessedChar()
                 continue
-            cls.guessCount -= 1
-            if ( GuessCheck.isCorrect(guess,cls.word) ):
-                GuessCheck.correctGuesses.append(guess)
-                cls.partialGuessedString  =  PrintString.correctGuess(GuessCheck.correctGuesses,cls.word)
+            self._guessCount -= 1
+            if ( self._guessCheck.isCorrect(guess,self._word) ):
+                self._guessCheck.correctGuesses.append(guess)
+                self._partialGuessedString  =  self._printString.correctGuess(self._guessCheck.correctGuesses,self._word)
             else:
-                GuessCheck.incorrectGuesses.append(guess)
-                PrintString.incorrectGuess()
-                print(f"You have {cls.guessCount} guesses left")
-            if ( "".join(cls.partialGuessedString) == cls.word ):
-                cls.wordGuessed = True
+                self._guessCheck.incorrectGuesses.append(guess)
+                self._printString.incorrectGuess()
+                print(f"You have {self._guessCount} guesses left")
+
+            if ( "".join(self._partialGuessedString) == self._word ):
+                self._wordGuessed = True
                 print("You guessed the word")
                 break
         
-        if not cls.wordGuessed:
+        if not self._wordGuessed:
             print("Out of Guesses")
-            print("The word was ",cls.word)
+            print("The word was ",self._word)
         
         newGame = input("Type y for new game , else n for end ->  ")
         if newGame == 'y':
-            cls.play()
+            self.play()
        
 
 if __name__ == "__main__":
-    Game.play()
+    Game().play()
 
 
