@@ -35,3 +35,5 @@ class TestGuessCheck(unittest.TestCase):
         self.assertEqual(guessCheck.wordGuessed(["a","b"] ,"ab" ) , True)
         self.assertEqual(guessCheck.wordGuessed(["a","b"] ,"ac" ) , False)
 
+unittest.main()
+

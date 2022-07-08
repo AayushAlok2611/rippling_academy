@@ -102,7 +102,7 @@ class GuessCheck:
         return False
     
     def wordGuessed(self,partialGuessedString,word) -> bool:
-        return ( "".join(self._partialGuessedString) == self._word )
+        return ( "".join(partialGuessedString) == self._word )
 
 
 class PrintString:
