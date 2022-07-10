@@ -80,19 +80,29 @@ class GuessCount:
 class User:
     def enterInput(self) -> str:
         s = input("Guess an alphabet ")
-        while(len(s)==0 or len(s) > 1 or not(s[0]>='a' and s[0]<='z') or not (s[0]>='a' and s[0]<='z') ):
+        while( self.invalidInput (s) ):
             s = input("Enter a single alphabet ")
         return s
     
+    def invalidInput(self,s) -> bool:
+        return ( len(s)==0 or len(s) > 1 or not(s[0]>='a' and s[0]<='z') or not (s[0]>='a' and s[0]<='z') )
+
+    
 class GuessCheck:
     def __init__(self) -> None:
-        self.correctGuesses = [] #list of chars
-        self.incorrectGuesses = [] #list of chars
-
+        self.correctGuesses = set() #set of chars
+        self.incorrectGuesses = set() #set of chars
+    
+    def addCorrectGuess(self,guess) -> None :
+        self.correctGuesses.add(guess)
+    
+    def addIncorrectGuess(self,guess) -> None :
+        self.incorrectGuesses.add(guess)
+    
     def alreadyGuessedChar(self,guess) -> bool:
-        if ( guess in self.correctGuesses ):
+        if  guess in self.correctGuesses :
             return True
-        if ( guess in self.incorrectGuesses ):
+        if  guess in self.incorrectGuesses :
             return True
         return False
     
@@ -101,17 +111,14 @@ class GuessCheck:
             return True
         return False
     
-    def wordGuessed(self,partialGuessedString,word) -> bool:
-        return ( "".join(partialGuessedString) == word )
+    def wordGuessed(self,partialGuessedWord,word) -> bool:
+        return ( "".join(partialGuessedWord) == word )
 
 
 class PrintString:
     def initialPrint(self,word) -> list[str]:
-        lst = []
-        for i in range(len(word)):
-            print("_",end=" ")
-            lst.append('_ ')
-        print("")
+        lst = ["_ "] * len(word)
+        print("".join(lst))
         return lst
 
     def alreadyGuessedChar(self) -> None:
@@ -119,10 +126,10 @@ class PrintString:
     
     def correctGuess(self,correctGuesses,word) -> list[str]:
         lst = []
-        for i in range(len(word)):
-            if (word[i] in correctGuesses):
-                print(word[i],end=" ")
-                lst.append(word[i])
+        for ch in word:
+            if (ch in correctGuesses):
+                print(ch,end=" ")
+                lst.append(ch)
             else:
                 print("_",end=" ")
                 lst.append('_')
@@ -141,12 +148,12 @@ class Game:
         self._word = RandomWordGenerator().generate()
         self._wordGuessed = False
         self._user = User()
-        self._partialGuessedString = []
+        self._partialGuessedWord = []
 
     def play(self) -> None:
         
         #initial print of dashed string
-        self._partialGuessedString  = self._printString.initialPrint(self._word)
+        self._partialGuessedWord  = self._printString.initialPrint(self._word)
 
         while(self._guessCount > 0):
 
@@ -158,15 +165,15 @@ class Game:
             
             self._guessCount -= 1
             if ( self._guessCheck.isCorrect(guess,self._word) ):
-                self._guessCheck.correctGuesses.append(guess)
-                self._partialGuessedString  =  self._printString.correctGuess(self._guessCheck.correctGuesses,self._word)
+                self._guessCheck.addCorrectGuess(guess)
+                self._partialGuessedWord  =  self._printString.correctGuess(self._guessCheck.correctGuesses,self._word)
             else:
-                self._guessCheck.incorrectGuesses.append(guess)
+                self._guessCheck.addIncorrectGuess(guess)
                 self._printString.incorrectGuess()
                 print(f"You have {self._guessCount} guesses left")
 
             
-                self._wordGuessed = self._guessCheck.wordGuessed(self._partialGuessedString,self._word)
+                self._wordGuessed = self._guessCheck.wordGuessed(self._partialGuessedWord,self._word)
 
                 if self._wordGuessed:
                     print("You guessed the word")
