@@ -89,9 +89,10 @@ class User:
 
     
 class GuessCheck:
-    def __init__(self) -> None:
+    def __init__(self,word = None) -> None:
         self.correctGuesses = set() #set of chars
         self.incorrectGuesses = set() #set of chars
+        self.word = word
     
     def addCorrectGuess(self,guess) -> None :
         self.correctGuesses.add(guess)
@@ -106,13 +107,13 @@ class GuessCheck:
             return True
         return False
     
-    def isCorrect(self,guess,word) -> bool:
-        if guess in word:
+    def isCorrect(self,guess) -> bool:
+        if guess in self.word:
             return True
         return False
     
-    def wordGuessed(self,partialGuessedWord,word) -> bool:
-        return ( "".join(partialGuessedWord) == word )
+    def wordGuessed(self,partialGuessedWord) -> bool:
+        return ( "".join(partialGuessedWord) == self.word )
 
 
 class PrintString:
@@ -142,10 +143,10 @@ class PrintString:
 class Game:
     
     def __init__(self) -> None:
-        self._printString = PrintString()
-        self._guessCheck = GuessCheck()
-        self._guessCount = GuessCount().generate()
         self._word = RandomWordGenerator().generate()
+        self._printString = PrintString()
+        self._guessCheck = GuessCheck(self._word)
+        self._guessCount = GuessCount().generate()
         self._wordGuessed = False
         self._user = User()
         self._partialGuessedWord = []
@@ -164,7 +165,7 @@ class Game:
                 continue
             
             self._guessCount -= 1
-            if ( self._guessCheck.isCorrect(guess,self._word) ):
+            if ( self._guessCheck.isCorrect(guess) ):
                 self._guessCheck.addCorrectGuess(guess)
                 self._partialGuessedWord  =  self._printString.correctGuess(self._guessCheck.correctGuesses,self._word)
             else:
@@ -173,7 +174,7 @@ class Game:
                 print(f"You have {self._guessCount} guesses left")
 
             
-                self._wordGuessed = self._guessCheck.wordGuessed(self._partialGuessedWord,self._word)
+                self._wordGuessed = self._guessCheck.wordGuessed(self._partialGuessedWord)
 
                 if self._wordGuessed:
                     print("You guessed the word")
@@ -190,5 +191,4 @@ class Game:
 
 if __name__ == "__main__":
     Game().play()
-
 
