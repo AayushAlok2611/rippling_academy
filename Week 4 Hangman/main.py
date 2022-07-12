@@ -185,10 +185,11 @@ class Game:
             print("The word was ",self._word)
         
         newGame = input("Type y for new game , else n for end ->  ")
-        if newGame == 'y':
-            self.play()
+        return newGame
        
 
 if __name__ == "__main__":
-    Game().play()
+    s = Game().play()
+    while(s == 'y'):
+        s = Game().play()
 
