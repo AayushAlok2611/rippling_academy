@@ -12,9 +12,12 @@ https://docs.djangoproject.com/en/4.0/ref/settings/
 
 from pathlib import Path
 import mongoengine
+import certifi
 
 #connect to mongoDB database
-mongoengine.connect( host = "mongodb+srv://AayushAlok:incorrect2611@firstcluster.xhmhqdw.mongodb.net/?retryWrites=true&w=majority",db = "url-shortener" )
+
+mongoengine.connect( db = "urlshortener" , host = "mongodb+srv://AayushAlok:incorrect2611@firstcluster.xhmhqdw.mongodb.net/?retryWrites=true&w=majority" , tlsCAFile=certifi.where() )
+
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -78,13 +81,11 @@ WSGI_APPLICATION = 'URLShortener.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/4.0/ref/settings/#databases
 
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.sqlite3',
-#         'NAME': BASE_DIR / 'db.sqlite3',
-#     }
+# DATABASES: dict[str, dict[str, str]] = {
+#     "default": {
+#         "ENGINE": "django.db.backends.dummy",
+#     },
 # }
-
 
 # Password validation
 # https://docs.djangoproject.com/en/4.0/ref/settings/#auth-password-validators
