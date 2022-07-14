@@ -19,7 +19,9 @@ from app import views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('',views.landing),
-    path('signup',views.signupUser),
-    path('login',views.loginUser)
+    path('',views.landing), #display login and signup options 
+    path('signup',views.signupUser), #display signup page
+    path('login',views.loginUser),  #display login page
+    path('home',views.homeView), #display home page where url to be shortened is entered (this url should be protected)
+
 ]
