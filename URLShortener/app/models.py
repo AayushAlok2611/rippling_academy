@@ -1,9 +1,11 @@
 from telnetlib import DO
 from django.db import models
 from mongoengine import *
+import mongoengine
+
 
 # Create your models here.
-class ShortURL(EmbeddedDocument):
+class ShortURL(Document):
     shortURL = StringField(max_length=None)
     originalURL = StringField(max_length=None)
     hitCount = IntField()
@@ -12,5 +14,5 @@ class ShortURL(EmbeddedDocument):
 class User(Document):
     username = StringField()
     password = StringField()
-    shortURLs = ListField(EmbeddedDocumentField(ShortURL))
+    shortURLs = ListField(ReferenceField(ShortURL,reverse_delete_rule = mongoengine.PULL))
 
