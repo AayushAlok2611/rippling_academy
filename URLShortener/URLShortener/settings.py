@@ -16,6 +16,9 @@ import certifi
 
 #connect to mongoDB database
 
+# Useful link for certificate-verify-failed error
+# https://stackoverflow.com/questions/68123923/pymongo-ssl-certificate-verify-failed-certificate-verify-failed-unable-to-ge/68125708#68125708
+
 mongoengine.connect( db = "urlshortener" , host = "mongodb+srv://AayushAlok:incorrect2611@firstcluster.xhmhqdw.mongodb.net/?retryWrites=true&w=majority" , tlsCAFile=certifi.where() )
 
 
