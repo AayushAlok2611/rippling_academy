@@ -24,8 +24,7 @@ def signupUser(request) :
         user = User(username = username,password = password)
         user.save()
         print(user.id)
-        s = str(username) + "  " + str(password)
-        return HttpResponse(s)
+        return HttpResponse("User has been added to DB")
     return HttpResponse("GET Request -> A form will be rendered to sign up user")
 
 @csrf_exempt
