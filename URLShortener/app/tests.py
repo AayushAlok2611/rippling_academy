@@ -1,6 +1,5 @@
 from django.test import TestCase,Client
-from django.test.runner import DiscoverRunner
-from .models import User
+from .models import User,ShortURL
 from mongoengine import *
 
 # Create your tests here.
@@ -86,7 +85,30 @@ class ShortenURL(TestCase):
         self.assertEqual(response.status_code,200)
     
     def test_post_home_view(self):
+
+        ShortURL(shortURL = "short.ly/ncg-2022" , originalURL = "google.com" , hitCount = 0).save()
+
+        #handling case when originalURL already shortend and methodOfGeneration = auto
         response1 = self.client.post('/home',{'originalURL':'google.com','methodOfGenration':'auto'})
-        response2 = self.client.post('/home',{'originalURL':'google.com','methodOfGenration':'manual','manualShortURL':'ncg-2022'})
         self.assertEqual(response1.status_code,200)
+        self.assertEqual(response1.content.decode(),'For specified URL , a shortened URL has already been created')
+
+        #handling case when originalURL already shortend and methodOfGeneration = manual
+        response2 = self.client.post('/home',{'originalURL':'google.com','methodOfGenration':'manual' , 'manualShortURL':'ncg-2022' })
         self.assertEqual(response2.status_code,200)
+        self.assertEqual(response2.content.decode(),'For specified URL , a shortened URL has already been created')
+
+        #handling case when originalURL not yet shortend and methodOfGeneration = auto
+        response3 = self.client.post('/home',{'originalURL':'bing.com','methodOfGenration':'auto'})
+        self.assertEqual(response3.status_code,200)
+        self.assertEqual(response3.content.decode(),'Your URL has been shortened')
+
+        #handling case when originalURL already shortend and methodOfGeneration = manual
+        response4 = self.client.post('/home',{'originalURL':'yahoo.com','methodOfGenration':'manual' , 'manualShortURL':'ncg-2022' })
+        self.assertEqual(response4.status_code,200)
+        self.assertEqual(response4.content.decode(),'Your URL has been shortened')
+
+        #delete the unnecessarily created ShortURLs
+        ShortURL.objects(originalURL = "google.com").delete()
+        ShortURL.objects(originalURL = "bing.com").delete()
+        ShortURL.objects(originalURL = "yahoo.com").delete()        

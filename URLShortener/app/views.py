@@ -63,6 +63,6 @@ def homeView(request):
         shortURL = ShortURL(shortURL = modifiedURL,originalURL = originalURL,hitCount = 0)
         shortURL.save()
 
-        return HttpResponse(originalURL  + "  " + modifiedURL + "  "+ methodOfGeneration)
+        return HttpResponse('Your URL has been shortened')
 
     return HttpResponse("GET Request -> A form , to enter the URL to be shortened , is rendered")
