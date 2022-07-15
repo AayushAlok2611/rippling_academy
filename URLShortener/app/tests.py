@@ -8,10 +8,8 @@ from django.test.runner import DiscoverRunner
 #         pass
 # Create your tests here.
 class UserAndAuth(TestCase):
-
-    # Useful link
+    # Useful link 
     # https://stackoverflow.com/questions/48918354/testing-django-with-mongoengine
-
     def _fixture_setup(self):
         pass
     def _fixture_teardown(self):
@@ -36,4 +34,22 @@ class UserAndAuth(TestCase):
         self.assertEqual(response.status_code,200)
 
     
+class ShortenURL(TestCase):
+    # Useful link
+    # https://stackoverflow.com/questions/48918354/testing-django-with-mongoengine
+    def _fixture_setup(self):
+        pass
+    def _fixture_teardown(self):
+        pass
+    def setUp(self) :
+        self.client = Client()
 
+    def test_get_home_view(self):
+        response = self.client.get('/home')
+        self.assertEqual(response.status_code,200)
+    
+    def test_post_home_view(self):
+        response1 = self.client.post('/home',{'originalURL':'google.com','methodOfGenration':'auto'})
+        response2 = self.client.post('/home',{'originalURL':'google.com','methodOfGenration':'manual','manualShortURL':'ncg-2022'})
+        self.assertEqual(response1.status_code,200)
+        self.assertEqual(response2.status_code,200)
