@@ -13,13 +13,22 @@ https://docs.djangoproject.com/en/4.0/ref/settings/
 from pathlib import Path
 import mongoengine
 import certifi
+import sys
+import mongomock
+
+
+#connect to mongoDB database
+
+TESTING = len(sys.argv) > 1 and sys.argv[1] == 'test'
 
 #connect to mongoDB database
 
 # Useful link for certificate-verify-failed error
 # https://stackoverflow.com/questions/68123923/pymongo-ssl-certificate-verify-failed-certificate-verify-failed-unable-to-ge/68125708#68125708
-
-mongoengine.connect( db = "urlshortener" , host = "mongodb+srv://AayushAlok:incorrect2611@firstcluster.xhmhqdw.mongodb.net/?retryWrites=true&w=majority" , tlsCAFile=certifi.where() )
+if not TESTING:
+    mongoengine.connect( db = "urlshortener" , host = "mongodb+srv://AayushAlok:incorrect2611@firstcluster.xhmhqdw.mongodb.net/?retryWrites=true&w=majority" , tlsCAFile=certifi.where() )
+else:
+    mongoengine.connect(db = 'mongoenginetest', host='mongomock://localhost')
 
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.

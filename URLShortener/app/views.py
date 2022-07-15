@@ -1,48 +1,34 @@
 from django.shortcuts import render
 from django.http import HttpResponse
 from django. views. decorators. csrf import csrf_exempt
-from app.models import User,ShortURL
+from .models import ShortURL
 
 
 def generateRandomShortUrl(url) -> str:
     #code to genrate random short url form given url
     return "abc"
 
+def authenticateUser(request)-> str:
+    if "username" in request.META.keys():    
+        username = request.META['username']
+        return username
+    return ""
+
+
 # Create your views here.
 
 def landing(request):
     return HttpResponse("You can either login here or sign up")
 
-@csrf_exempt
-def signupUser(request) :
-    if request.method == 'POST':
-        username = request.POST.get('username')
-        password = request.POST.get('password')
-        existingUsers = User.objects(username=username)
-        if len( existingUsers ) >  0:
-            return HttpResponse('User already exists')
-        user = User(username = username,password = password)
-        user.save()
-        return HttpResponse("User has been added to DB")
-    return HttpResponse("GET Request -> A form will be rendered to sign up user")
 
-@csrf_exempt
-def loginUser(request):
-    if request.method == 'POST':
-        username = request.POST.get('username')
-        password = request.POST.get('password')
-        existingUsers = User.objects(username=username)
-
-        #No existing users or existing user but incorrect password
-        if len(existingUsers) ==  0 or existingUsers[0].password != password:
-            return HttpResponse('Username or password incorrect')
-        return HttpResponse('You are logged in')  
-    return HttpResponse('GET Request -> A form will be rendered to login user')
-
-
-#this view must be protected -> only nlogged in user should be able to access this view
+#this view must be protected -> only logged in user should be able to access this view
 @csrf_exempt
 def homeView(request):
+
+    user = authenticateUser(request)
+
+    if len(user)==0:
+        return HttpResponse('Not authenticated to access this URL')
 
     if request.method == 'POST':
         originalURL = request.POST.get('originalURL')
@@ -54,7 +40,7 @@ def homeView(request):
             return HttpResponse('For specified URL , a shortened URL has already been created')
 
         methodOfGeneration = request.POST.get('methodOfGeneration')
-        modifiedURL = "short.ly/"
+        modifiedURL = "http://127.0.0.1:8000/"
         if methodOfGeneration == 'manual':
             modifiedURL += request.POST.get('manualShortURL')
         elif methodOfGeneration == 'auto':

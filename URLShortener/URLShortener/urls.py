@@ -14,14 +14,10 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
-from django.urls import path
-from app import views
+from django.urls import path,include
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('',views.landing), #display login and signup options 
-    path('signup',views.signupUser), #display signup page
-    path('login',views.loginUser),  #display login page
-    path('home',views.homeView), #display home page where url to be shortened is entered (this url should be protected)
-
+    path('',include('users.urls')),
+    path('',include('app.urls'))  
 ]
