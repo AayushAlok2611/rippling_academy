@@ -23,7 +23,6 @@ def signupUser(request) :
             return HttpResponse('User already exists')
         user = User(username = username,password = password)
         user.save()
-        print(user.id)
         return HttpResponse("User has been added to DB")
     return HttpResponse("GET Request -> A form will be rendered to sign up user")
 

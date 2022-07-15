@@ -1,8 +1,7 @@
 from django.test import TestCase,Client
 from django.test.runner import DiscoverRunner
 from .models import User
-import mongoengine
-
+from mongoengine import *
 
 # Create your tests here.
 class UserAndAuth(TestCase):
@@ -12,18 +11,9 @@ class UserAndAuth(TestCase):
         pass
     def _fixture_teardown(self):
         pass
-    def setUp(self) :
-        self.client = Client()
 
-    #Setting up the mongomock DB
-    @classmethod
-    def setUpClass(cls) -> None:
-        mongoengine.connect('mongoenginetest', host='mongomock://localhost', alias='testdb')
-    
-    #Deleting the mongomock DB
-    @classmethod
-    def tearDownClass(cls) -> None:
-        mongoengine.disconnect(alias='testdb')
+    def setUp(self) :
+        self.client = Client()      
 
     def test_login_get(self) :
         response = self.client.get('/login')
@@ -35,13 +25,9 @@ class UserAndAuth(TestCase):
         self.assertEqual(response.status_code,200)
         self.assertEqual(response.content.decode(),'GET Request -> A form will be rendered to sign up user')
     
-
-    #Used mongomock library - Useful links
-    #https://stackoverflow.com/questions/48918354/testing-django-with-mongoengine
-    #https://docs.mongoengine.org/guide/mongomock.html
     def test_login_post(self):
 
-        #here this user is being saved in mocked mongoDB created using mongomock
+        #here this user is being saved in mongoDB 
 
         User(username='DummyPresentUser',password="1234567890").save()
         
@@ -60,13 +46,12 @@ class UserAndAuth(TestCase):
         self.assertEqual(response3.status_code,200)
         self.assertEqual(response3.content.decode(),"Username or password incorrect")
 
-        #deleting dummy user from mongomock DB (necessary -> other test of same testCase class wont have access to "DummyPresentUser")
-        User.objects(username = 'DummyPresentUser').delete()
-
+        #deleting dummy user from mongo DB (necessary -> other test of same testCase class wont have access to "DummyPresentUser")
+        User.objects(username = 'DummyPresentUser')[0].delete()
 
     def test_signup_post(self):
 
-        #Create a dummy user
+        # Create a dummy user
         User(username='DummyPresentUser',password="1234567890").save()
 
         #handling case when user already exists
@@ -79,8 +64,11 @@ class UserAndAuth(TestCase):
         self.assertEqual(response2.status_code,200)
         self.assertEqual(response2.content.decode(),'User has been added to DB')
 
-        #deleting dummy user from mongomock DB (necessary -> other test of same testCase class wont have access to "DummyPresentUser")
-        User.objects(username = 'DummyPresentUser').delete()
+        # # deleting dummy user from mongo DB (necessary -> other test of same testCase class wont have access to "DummyPresentUser" )
+        User.objects(username = 'DummyPresentUser')[0].delete()
+
+        # DummyAbsentUser must be deleted because it had been added to the DB earlier
+        User.objects(username = "DummyAbsentUser" )[0].delete()
 
     
 class ShortenURL(TestCase):
