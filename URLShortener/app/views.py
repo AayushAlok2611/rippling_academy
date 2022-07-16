@@ -1,18 +1,35 @@
+from operator import truediv
+from urllib.request import Request
 from django.shortcuts import render
 from django.http import HttpResponse
 from django. views. decorators. csrf import csrf_exempt
 from .models import ShortURL
+from users.models import User
 
 
-def generateRandomShortUrl(url) -> str:
+def generateRandomShortUrl(url : str) -> str:
     #code to genrate random short url form given url
     return "abc"
 
-def authenticateUser(request)-> str:
-    if "username" in request.META.keys():    
-        username = request.META['username']
-        return username
-    return ""
+def authenticateUser(request : Request) -> User:
+    if not "username" in request.headers.keys():    
+        return None
+    username = request.headers['username']
+    user = User.objects(username = username )[0]
+    return user
+
+def URLAlreadyShortenedByUser(user : User , originalURL : str ) -> bool :
+    shortURLsForOriginalURL = ShortURL.objects(originalURL = originalURL)
+    for shortURL in shortURLsForOriginalURL:
+        # print(type(shortURL.user) , shortURL.user , '='*20)
+        if shortURL.user == user:
+            return True
+    return False
+
+def getShortenedURL( originalURL : str , methodOfGeneration : str , request : Request )-> str:
+    if methodOfGeneration == 'manual':
+            return request.POST.get('manualShortURL')
+    return generateRandomShortUrl(originalURL)
 
 
 # Create your views here.
@@ -27,26 +44,21 @@ def homeView(request):
 
     user = authenticateUser(request)
 
-    if len(user)==0:
+    if user == None:
         return HttpResponse('Not authenticated to access this URL')
 
     if request.method == 'POST':
         originalURL = request.POST.get('originalURL')
 
-        existingShortURL = ShortURL.objects(originalURL = originalURL)
-
-        #problem if different users try to shorten same URL -> possibly authentication will take care of it ??
-        if len(existingShortURL) > 0:
-            return HttpResponse('For specified URL , a shortened URL has already been created')
+        if URLAlreadyShortenedByUser(user,originalURL):
+            return HttpResponse('For specified URL , a shortened URL has already been created by user')
 
         methodOfGeneration = request.POST.get('methodOfGeneration')
         modifiedURL = "http://127.0.0.1:8000/"
-        if methodOfGeneration == 'manual':
-            modifiedURL += request.POST.get('manualShortURL')
-        elif methodOfGeneration == 'auto':
-            modifiedURL += generateRandomShortUrl(originalURL)
 
-        shortURL = ShortURL(shortURL = modifiedURL,originalURL = originalURL,hitCount = 0)
+        modifiedURL += getShortenedURL(originalURL,methodOfGeneration,request)
+
+        shortURL = ShortURL(shortURL = modifiedURL,originalURL = originalURL,hitCount = 0,user = user)
         shortURL.save()
 
         return HttpResponse('Your URL has been shortened')
