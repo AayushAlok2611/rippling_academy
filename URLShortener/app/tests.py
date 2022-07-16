@@ -18,13 +18,14 @@ class ShortenURL(TestCase):
         #Dummy user
         User(username='DummyPresentUser',password="1234567890").save()
 
-        #testing for unauthenticated request to URL
+        #testing for unauthenticated GET request to URL
         response1 = self.client.get('/home')
         self.assertEqual(response1.status_code,200)
         self.assertEqual(response1.content.decode(),'Not authenticated to access this URL')
 
+        #Prefix HTTP and keep it in all CAPS to convert request.META to request.headers
         #testing for authenticated request to URL
-        response2 = self.client.get('/home',**{'username':'DummyPresentUser'})
+        response2 = self.client.get( '/home',**{'HTTP_USERNAME':'DummyPresentUser'} )
         self.assertEqual(response2.status_code,200)
         self.assertEqual(response2.content.decode(),'GET Request -> A form , to enter the URL to be shortened , is rendered')
 
@@ -33,30 +34,45 @@ class ShortenURL(TestCase):
 
     
     def test_post_home_view(self):
+        
+        #Dummy user
+        user = User(username='DummyPresentUser',password="1234567890")
+        user.save()
 
-        ShortURL(shortURL = "short.ly/ncg-2022" , originalURL = "google.com" , hitCount = 0).save()
+        ShortURL(shortURL = "short.ly/ncg-2022" , originalURL = "google.com" , hitCount = 0,user = user).save()
 
-        #handling case when originalURL already shortend and methodOfGeneration = auto
-        response1 = self.client.post('/home',{'originalURL':'google.com','methodOfGenration':'auto'})
-        self.assertEqual(response1.status_code,200)
-        self.assertEqual(response1.content.decode(),'For specified URL , a shortened URL has already been created')
+        #testing for unauthenticated POST request to URL
+        response = self.client.post('/home',{'originalURL':'google.com','methodOfGenration':'auto'})
+        self.assertEqual(response.status_code,200)
+        self.assertEqual(response.content.decode(),'Not authenticated to access this URL')
 
-        #handling case when originalURL already shortend and methodOfGeneration = manual
-        response2 = self.client.post('/home',{'originalURL':'google.com','methodOfGenration':'manual' , 'manualShortURL':'ncg-2022' })
-        self.assertEqual(response2.status_code,200)
-        self.assertEqual(response2.content.decode(),'For specified URL , a shortened URL has already been created')
+        #Prefix HTTP and keep it in all CAPS to convert request.META to request.headers
 
-        #handling case when originalURL not yet shortend and methodOfGeneration = auto
-        response3 = self.client.post('/home',{'originalURL':'bing.com','methodOfGenration':'auto'})
-        self.assertEqual(response3.status_code,200)
-        self.assertEqual(response3.content.decode(),'Your URL has been shortened')
+        #handling case when originalURL already shortend by current user and methodOfGeneration = auto
+        response = self.client.post('/home',{'originalURL':'google.com','methodOfGenration':'auto'},**{'HTTP_USERNAME':'DummyPresentUser'})
+        self.assertEqual(response.status_code,200)
+        self.assertEqual(response.content.decode(),'For specified URL , a shortened URL has already been created by user')
 
-        #handling case when originalURL already shortend and methodOfGeneration = manual
-        response4 = self.client.post('/home',{'originalURL':'yahoo.com','methodOfGenration':'manual' , 'manualShortURL':'ncg-2022' })
-        self.assertEqual(response4.status_code,200)
-        self.assertEqual(response4.content.decode(),'Your URL has been shortened')
+
+        # handling case when originalURL already shortend by current user and methodOfGeneration = manual
+        response = self.client.post('/home',{'originalURL':'google.com','methodOfGenration':'manual' , 'manualShortURL':'ncg-2022' },**{'HTTP_USERNAME':'DummyPresentUser'})
+        self.assertEqual(response.status_code,200)
+        self.assertEqual(response.content.decode(),'For specified URL , a shortened URL has already been created by user')
+
+        #handling case when originalURL not yet shortend by current user and methodOfGeneration = auto
+        response = self.client.post('/home',{'originalURL':'bing.com','methodOfGenration':'auto'},**{'HTTP_USERNAME':'DummyPresentUser'})
+        self.assertEqual(response.status_code,200)
+        self.assertEqual(response.content.decode(),'Your URL has been shortened')
+
+        #handling case when originalURL not yet shortend by current user and methodOfGeneration = manual
+        response = self.client.post('/home',{'originalURL':'yahoo.com','methodOfGenration':'manual' , 'manualShortURL':'ncg-2022' },**{'HTTP_USERNAME':'DummyPresentUser'})
+        self.assertEqual(response.status_code,200)
+        self.assertEqual(response.content.decode(),'Your URL has been shortened')
 
         #delete the unnecessarily created ShortURLs
         ShortURL.objects(originalURL = "google.com").delete()
         ShortURL.objects(originalURL = "bing.com").delete()
         ShortURL.objects(originalURL = "yahoo.com").delete()        
+
+        #delete dummy user
+        user.delete()

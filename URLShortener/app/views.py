@@ -42,7 +42,10 @@ def landing(request):
 @csrf_exempt
 def homeView(request):
 
+    # print(request.headers , "==="*30)
+    # print(request.META.keys() , "==="*30)
     user = authenticateUser(request)
+
 
     if user == None:
         return HttpResponse('Not authenticated to access this URL')
